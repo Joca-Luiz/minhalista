@@ -21,3 +21,19 @@ model Buyer {
   complement String
   password String
 }
+
+model Seller {
+  id Int @id @default(autoincrement())
+  fantasy_name String
+  logo_path String
+  email String @unique @db.VarChar(255)
+  cnpj String @unique @db.VarChar(17)
+  tel String @unique @db.VarChar(15)
+  cep String @db.VarChar(9)
+  number String @db.VarChar(10)
+  address String
+  city String
+  uf String @db.Char(2)
+  complement String
+  password String
+}

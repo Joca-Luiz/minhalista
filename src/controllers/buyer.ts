@@ -5,13 +5,34 @@ import { validator } from "@middlewares/validator";
 import BuyerModels from "@models/Buyer";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { authBuyer } from "@middlewares/authBuyer";
-import { userIsAlreadyRegistered } from "@middlewares/userIsAlreadyRegistered";
 
 dotenv.config();
 
 const router: Router = Router();
 const JWT_SECRET: string = process.env.JWT_SECRET ?? "secret";
+
+router.get(
+  "/",
+  BuyerModels.auth,
+  (request: Request, response: Response): void => {
+    const buyer: jwt.JwtPayload | String | undefined = request.buyer;
+    response.status(200).json({
+      success: true,
+      buyer,
+    });
+    return;
+  }
+);
+
+router.get(
+  "/alreadyLogged/:value",
+  BuyerModels.buyerIsAlreadyRegistered,
+  (request: Request, response: Response) => {
+    response.status(200).json({
+      success: true,
+    });
+  }
+);
 
 router.post(
   "/login",
@@ -47,15 +68,6 @@ router.post(
   }
 );
 
-router.get("/", authBuyer, (request: Request, response: Response): void => {
-  const buyer: jwt.JwtPayload | String | undefined = request.buyer;
-  response.status(200).json({
-    success: true,
-    buyer,
-  });
-  return;
-});
-
 router.post(
   "/",
   body("name").notEmpty().isLength({ max: 191, min: 5 }),
@@ -70,7 +82,7 @@ router.post(
   body("complement").isLength({ max: 191, min: 5 }),
   body("password").isLength({ max: 191, min: 5 }),
   validator,
-  userIsAlreadyRegistered,
+  BuyerModels.buyerIsAlreadyRegistered,
   async (request: Request, response: Response): Promise<void> => {
     const buyerValues: Buyer = request.body;
     await BuyerModels.create(buyerValues).then((buyer: Buyer | null): void => {
@@ -86,7 +98,7 @@ router.post(
 
 router.delete(
   "/",
-  authBuyer,
+  BuyerModels.auth,
   async (request: Request, response: Response): Promise<void> => {
     const id: number = (request.buyer as Buyer).id;
     BuyerModels.delete(id)
