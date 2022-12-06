@@ -25,7 +25,7 @@ router.get(
 );
 
 router.get(
-  "/alreadyLogged/:value",
+  "/alreadySingup/:value",
   BuyerModels.buyerIsAlreadyRegistered,
   (request: Request, response: Response) => {
     response.status(200).json({
